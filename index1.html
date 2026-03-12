@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Income Expense Tracker</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+body{
+ background-color: black;
+color:#f4f6f9;
+font-family:Arial;
+padding:40px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+
+
+.form {
+    display: grid;
+    width: 300px;
+    place-items: center;
+    background: rgb(5, 229, 245);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin: 10% auto;
+    
+}
+.form:hover{
+ box-shadow: 0 3px 50px rgba(4, 207, 170, 0.1);}
+
+
+.form #category{
+    width: 100%;
+    padding: 10px;
+     margin: 10PX;
+}
+.form input{
+    width: 93%;
+    margin: 10PX;
+     padding: 10px;
+}
+.form button{
+    width: 100%;
+     margin: 10PX;
+     padding: 10px;
+}
+
+
+
+.table-container{
+background:white;
+padding:10px;
+border-radius:8px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+margin-bottom:30px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+table th,
+table td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
+
+thead{
+background:#007bff;
+color:white;
+}
+
+
+
+.total{
+display:flex;
+justify-content:space-between;
+}
+
+.total h3{
+background:white;
+padding:15px;
+border-radius:6px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+.amount{
+    display: grid;
+    place-content: center;
+    text-align: center;
+    padding: 20px;
+    margin: 20px;
+    
+
+}
+.amount div{
+    width: 300px;
+   
+       border: 1px solid red;
+  
+    /* height: 500px; */
+}
+.amount div:hover{
+     box-shadow: 0 0 40px aquamarine;
+
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+<div class="form">
+
+<h1>Income & Expense</h1>
+
+<select id="category">
+<option value="">Select Category</option>
+<option value="Income">Income</option>
+<option value="Expense">Expense</option>
+</select>
+
+<input type="text" id="title" placeholder="Enter title">
+
+<input type="number" id="amount" placeholder="Enter amount">
+
+<button onclick="addData()">Submit</button>
+
+</div>
+
+
+<table>
+
+<thead>
+<tr>
+<th>S.No</th>
+<th>Category</th>
+<th>Title</th>
+<th>Income</th>
+<th>Expense</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+<tfoot>
+<tr>
+<td colspan="3"></td>
+<td>Total Income : <span id="tableIncome">0</span></td>
+<td>Total Expense : <span id="tableExpense">0</span></td>
+</tr>
+</tfoot>
+
+</table>
+
+<div class="amount">
+    <div>
+
+<h3>Total Income = <span id="totalIncome">0</span></h3>
+<h3>Total Expense = <span id="totalExpense">0</span></h3>
+<h3>Balance = <span id="balance">0</span></h3>
+</div>
+</div>
+
+<script>
+
+let count = 0;
+let totalIncome = 0;
+let totalExpense = 0;
+
+let dataList = [];
+
+
+$(document).ready(function(){
+
+let savedData = localStorage.getItem("expenseData");
+
+if(savedData){
+
+dataList = JSON.parse(savedData);
+
+renderTable();
+
+}
+
+});
+
+
+
+function addData(){
+
+let category = $("#category").val().trim();
+let title = $("#title").val().trim();
+let amount = parseFloat($("#amount").val());
+
+if(!category || !title || isNaN(amount) || amount<=0){
+
+alert("Please fill all fields correctly");
+
+return;
+
+}
+
+count++;
+
+let obj = {
+
+id:count,
+category:category,
+title:title,
+amount:amount
+
+};
+
+dataList.push(obj);
+
+localStorage.setItem("expenseData",JSON.stringify(dataList));
+
+renderTable();
+
+$("#category").val("");
+$("#title").val("");
+$("#amount").val("");
+
+}
+
+
+
+function renderTable(){
+
+$("#tableBody").html("");
+
+totalIncome=0;
+totalExpense=0;
+
+dataList.forEach((item,index)=>{
+
+let incomeCol="";
+let expenseCol="";
+
+if(item.category==="Income"){
+
+totalIncome+=item.amount;
+
+incomeCol=item.amount;
+
+}else{
+
+totalExpense+=item.amount;
+
+expenseCol=item.amount;
+
+}
+
+let row=`
+
+<tr>
+<td>${index+1}</td>
+<td>${item.category}</td>
+<td>${item.title}</td>
+<td class="income">${incomeCol}</td>
+<td class="expense">${expenseCol}</td>
+</tr>
+
+`;
+
+$("#tableBody").append(row);
+
+});
+
+updateBalance();
+
+}
+
+
+
+function updateBalance(){
+
+$("#tableIncome").text(totalIncome);
+$("#tableExpense").text(totalExpense);
+
+$("#totalIncome").text(totalIncome);
+$("#totalExpense").text(totalExpense);
+
+$("#balance").text(totalIncome-totalExpense);
+
+}
+
+</script>
+
+</body>
+</html>
